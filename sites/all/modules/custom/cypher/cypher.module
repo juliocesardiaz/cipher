@@ -1,0 +1,123 @@
+ <?php
+ 	 function cypher_menu() {
+		  $items['cypher'] = array(
+			  'title' => 'Create a Shift Cypher',
+			  'page callback' => 'drupal_get_form',
+			  'page arguments' => array('cypher_form'),
+			  'access callback' => TRUE,
+			  'type' => MENU_NORMAL_ITEM,
+		  );
+		  $items['cypher_success_page'] = array(
+			  'title' => 'Success',
+			  'page callback' => 'cypher_success',
+			  'access callback' => TRUE,
+			  'type' => MENU_CALLBACK,
+		  );
+		  
+		  return $items;
+	  }
+	  
+	  function cypher_form() {
+		  $form['shift_value'] = array(
+			  '#title' => 'Shift Value',
+			  '#type' => 'textfield',
+			  '#description' => t('Please enter the amount of Shift you want each character to have'),
+			  '#element_validate' => array('element_validate_number'),
+			  '#required' => TRUE,
+		  );
+		  
+		  $form['shift_direction'] = array(
+			  '#title' => 'Shift Direction',
+			  '#type' => 'textfield',
+			  '#description' => t('Please enter the direction you want the Shift to occur (1 for right, -1 for left)'),
+			  '#element_validate' => array(),
+			  '#required' => TRUE,
+		  );
+		  
+		  $form['shift_phrase'] = array(
+			  '#title' => 'Phrase to Cyhper',
+			  '#type' => 'textfield',
+			  '#description' => t('Please enter the phrase you want to Cypher'),
+			  '#element_validate' => array('element_validate_letters'),
+			  '#required' => TRUE,
+		  );
+		  
+		  $form['submit'] = array(
+			  '#type' => 'submit',
+			  '#value' => 'Create Shift Cypher',
+		  );
+		  
+		  return $form;
+	  }
+	  
+	//   function element_validate_direction($element) {
+	// 	  if(($element['#value'] != 1) || ($element['#value'] != -1)) {
+	// 		  form_error($element, t('Direction must be either left or right'));
+	// 	  }
+	//   }
+	  
+	  function element_validate_letters($element) {
+		  if(preg_match('/([^A-Za-z\s])/', $element['#value'])) {
+			  form_error($element, t('Phrase must only contain letters'));
+		  }
+	  }
+	  
+	  function shift_cypher($value, $direction, $phrase) {
+		  $letters = array(
+			  'a' => 1,
+			  'b' => 2,
+			  'c' => 3,
+			  'd' => 4,
+			  'e' => 5,
+			  'f' => 6,
+			  'g' => 7,
+			  'h' => 8,
+			  'i' => 9,
+			  'j' => 10,
+			  'k' => 11,
+			  'l' => 12,
+			  'm' => 13,
+			  'n' => 14,
+			  'o' => 15,
+			  'p' => 16,
+			  'q' => 17,
+			  'r' => 18,
+			  's' => 19,
+			  't' => 20,
+			  'u' => 21,
+			  'v' => 22,
+			  'w' => 23,
+			  'x' => 24,
+			  'y' => 25,
+			  'z' => 26,
+		  );
+		  
+		  $words = explode(" ", strtolower($phrase));
+		  $cyphered_phrase = array();
+		  foreach($words as $word) {
+			  $len = strlen($word);
+			  $temp_word = "";
+			  for($i = 0; $i < $len; $i++) {
+				  $val = ($letters[$word[$i]] + ($value * $direction)) % 26;
+				  $temp_word .= array_search($val, $letters);
+			  }
+			  array_push($cyphered_phrase, $temp_word);
+		  } 
+		  return implode(" ", $cyphered_phrase);
+	  }
+	  
+	  function cypher_form_submit($form, &$form_state) {
+		  $s_value = $form_state['values']['shift_value'];
+		  $direction = $form_state['values']['shift_direction'];
+		  $phrase = $form_state['values']['shift_phrase'];
+		  $s_cypher = shift_cypher($s_value, $direction, $phrase);
+		  $_SESSION['cypher_output'] = $s_cypher;
+		  
+		  $form_state['redirect'] = 'cypher_success_page';
+	  }
+	  
+	  function cypher_success() {
+		  $answer = $_SESSION['cypher_output'];
+		  return "Your Shift Cyphered Phrase is:\r\n" . $answer;
+	  }
+ ?>

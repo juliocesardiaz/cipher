@@ -1,0 +1,5 @@
+name = Shift Cypher
+description = Encrypts a string with a Shift Cypher.
+package = Epicodus Examples
+core = 7.x
+files[] = cypher.module
