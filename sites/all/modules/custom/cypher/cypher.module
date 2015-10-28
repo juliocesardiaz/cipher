@@ -99,6 +99,9 @@
 			  $temp_word = "";
 			  for($i = 0; $i < $len; $i++) {
 				  $val = ($letters[$word[$i]] + ($value * $direction)) % 26;
+				  if($val < 0) {
+					  $val += 26;
+				  }
 				  $temp_word .= array_search($val, $letters);
 			  }
 			  array_push($cyphered_phrase, $temp_word);
